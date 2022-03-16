@@ -12,9 +12,11 @@ import Menu from '@mui/material/Menu';
 
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 import axios from 'axios';
+import { Avatar } from '@mui/material';
 
 export default function MenuAppBar() {
     const [auth, setAuth] = React.useState(sessionStorage.getItem('access_token') != null);
+    const [account, setAccount] = React.useState(null)
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleMenu = (event) => {
@@ -45,6 +47,8 @@ export default function MenuAppBar() {
             // console.log(result.data)
             sessionStorage.setItem('access_token', result.data.access_token)
             setAuth(true)
+            console.log(response)
+            setAccount({name: response.name, picture: response.picture.data})
         }
     }
 
@@ -65,7 +69,7 @@ export default function MenuAppBar() {
                         Only Cat
                     </Typography>
                     {auth ? (
-                        <div>
+                        <Box>
                             <IconButton
                                 size="large"
                                 aria-label="account of current user"
@@ -74,18 +78,10 @@ export default function MenuAppBar() {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
-                                {/* <Box
-                                    component="img"
-                                    sx={{
-                                        height: 233,
-                                        width: 350,
-                                        maxHeight: { xs: 233, md: 167 },
-                                        maxWidth: { xs: 350, md: 250 },
-                                    }}
-                                    alt="The house from the offer."
-                                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&w=350&dpr=2"
-                                /> */}
+                                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                                    {account ? account.name : 'Sign in'}
+                                </Typography>
+                                {account ? <Avatar alt={account.name} src={account.picture.url}/> : <AccountCircle />}
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
@@ -105,9 +101,10 @@ export default function MenuAppBar() {
                                 <MenuItem onClick={handleGetInfo}>โปรไฟล์</MenuItem>
                                 <MenuItem onClick={handleLogout}>ออกจากระบบ</MenuItem>
                             </Menu>
-                        </div>
+                        </Box>
                     ) : <FacebookLogin
                         appId="1076064602954449"
+                        fields = "name,picture"
                         callback={responseFacebook}
                         render={renderProps => (
                             <Button variant="outlined" color="white" onClick={renderProps.onClick}>เข้าสู่ระบบด้วย facebook</Button>
